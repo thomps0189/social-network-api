@@ -76,15 +76,15 @@ const thoughtController = {
             })
             .catch(err => res.status(400).json(err))
     },
-    addReaction({
-        params,
-        body
-    }, res) {
+    addReaction(req, res) {
         Thought.findOneAndUpdate({
-                _id: params.thoughtId
+                _id: req.params.thoughtId
             }, {
-                $addToSet: {
-                    reactions: body
+                $push: {
+                    reactions: {
+                        reactionBody: req.body.reactionBody,
+                        username: req.body.username
+                    }
                 }
             }, {
                 runValidators: true,
@@ -104,11 +104,6 @@ const thoughtController = {
     removeReaction(req, res) {
         Thought.findOneAndDelete({
                 _id: req.params.thoughtId
-            }, {
-                $pull: req.params.reactionId
-            }, {
-                runValidators: true,
-                new: true
             })
             .then(dbThoughtData => {
                 if (!dbThoughtData) {
